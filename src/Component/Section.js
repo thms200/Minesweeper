@@ -5,7 +5,7 @@ class Section extends Component {
     return (
       <section>
         <table className="sectionTable">
-          <tbody onClick={this.props.show}>
+          <tbody onClick={this.props.show} onContextMenu={this.props.count}>
             <tr>
               <td className="1">{this.props.container_clickLocation === [] ? "" : this.props.container_clickLocation[1]}</td>
               <td className="2">{this.props.container_clickLocation === [] ? "" : this.props.container_clickLocation[2]}</td>

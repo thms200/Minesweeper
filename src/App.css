@@ -15,7 +15,7 @@ header {
 }
 
 .header-time, .header-start, .header-reminder {
-  width: 70px;
+  width: 90px;
   height: 70px;
   margin: 10px;
   background-repeat: no-repeat;

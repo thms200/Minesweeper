@@ -5,6 +5,8 @@ import Start from './start.jpg';
 import Ing from './ing.jpg';
 import Fail from './fail.jpg';
 
+let timeFunc; //setInterval 함수를 담을 변수
+
 class Container extends Component {
   constructor(props) {
     super(props)
@@ -12,7 +14,9 @@ class Container extends Component {
       location: undefined,
       calculateLocation: undefined,
       clickLocation: [],
-      image: Start
+      image: Start,
+      time: 0,
+      bomb: 5
     }
   }
 
@@ -76,23 +80,32 @@ class Container extends Component {
       }
     }
 
-    this.setState({
+    this.setState({ //게임 시작 시 랜덤 지뢰 위치 state에 저장, 이전 게임 기록/시간 초기화
       location: locationArr,
       calculateLocation: calculateArr,
       image: Ing,
-      clickLocation: []
+      clickLocation: [],
+      time: 0
     });
 
-    const bombClass = document.querySelectorAll(".bomb");
+    const bombClass = document.querySelectorAll(".bomb"); //게임 재시작 할 때 지뢰 나왔던 부분 class(#배경 빨간색 처리) 제러
     bombClass.forEach(function(element){
       element.classList.remove("bomb");
     })
+
+    let ingTime = 1;
+    timeFunc = setInterval(() => { //1초마다 시간 증가
+      this.setState({
+        time: ingTime
+      })
+      ingTime++
+    }, 1000)
   }
 
   showNumberBomb(event) {
     const clickValue = Number(event.target.className);
 
-    if(this.state.calculateLocation !== undefined) {
+    if(this.state.calculateLocation !== undefined) { //클릭 시 근처 위치의 지뢰 숫자 표현
       this.setState(state => {
         const clickLocation = this.state.clickLocation;
         clickLocation[clickValue] = this.state.calculateLocation[clickValue];
@@ -101,13 +114,40 @@ class Container extends Component {
         };
       });
       
-      if(this.state.calculateLocation[clickValue] === "✸") {
-        // event.target.style.backgroundColor = "red";
+      if(this.state.calculateLocation[clickValue] === "✸") { //클린한 것이 지뢰 일 경우, 이미지 변경 + 지뢰위치 초기화, 시간 종료
         event.target.classList.add("bomb");
         this.setState({
           image: Fail,
           location: undefined,
           calculateLocation: undefined,
+        });
+        clearInterval(timeFunc);
+      }
+    }
+  }
+
+  countBomb(event) { //오른쪽 클릭 시 지뢰를 표시(♖)
+    event.preventDefault();
+    const clickValue = Number(event.target.className);
+
+    if(this.state.calculateLocation !== undefined) {
+      if(this.state.clickLocation[clickValue] === "♖") {
+        this.setState(state => {
+          const clickLocation = this.state.clickLocation;
+          clickLocation[clickValue] = undefined;
+          return {
+            clickLocation,
+            bomb: this.state.bomb + 1
+          };
+        });
+      } else {
+        this.setState(state => {
+          const clickLocation = this.state.clickLocation;
+          clickLocation[clickValue] = "♖";
+          return {
+            clickLocation, 
+            bomb: this.state.bomb - 1
+          };
         });
       }
     }
@@ -116,8 +156,19 @@ class Container extends Component {
   render() {
     return (
       <div>
-        <Header start={this.makeMinesweeper.bind(this)} container_image={this.state.image}></Header>
-        <Section show={this.showNumberBomb.bind(this)} container_clickLocation={this.state.clickLocation}></Section>
+        <Header 
+          start={this.makeMinesweeper.bind(this)}
+          container_image={this.state.image}
+          container_time={this.state.time}
+          container_bomb={this.state.bomb}
+        >
+        </Header>
+        <Section 
+          show={this.showNumberBomb.bind(this)}
+          container_clickLocation={this.state.clickLocation}
+          count={this.countBomb.bind(this)}
+        >
+        </Section>
       </div>
     )
   }
