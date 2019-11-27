@@ -4,6 +4,7 @@ import Section from "./Section";
 import Start from './start.jpg';
 import Ing from './ing.jpg';
 import Fail from './fail.jpg';
+import Success from './success.jpg'
 
 let timeFunc; //setInterval 함수를 담을 변수
 
@@ -14,6 +15,7 @@ class Container extends Component {
       location: undefined,
       calculateLocation: undefined,
       clickLocation: [],
+      bombLocation: undefined,
       image: Start,
       time: 0,
       bomb: 5
@@ -83,9 +85,11 @@ class Container extends Component {
     this.setState({ //게임 시작 시 랜덤 지뢰 위치 state에 저장, 이전 게임 기록/시간 초기화
       location: locationArr,
       calculateLocation: calculateArr,
-      image: Ing,
       clickLocation: [],
-      time: 0
+      bombLocation: arr,
+      image: Ing,
+      time: 0,
+      bomb: 5
     });
 
     const bombClass = document.querySelectorAll(".bomb"); //게임 재시작 할 때 지뢰 나왔던 부분 class(#배경 빨간색 처리) 제러
@@ -117,9 +121,10 @@ class Container extends Component {
       if(this.state.calculateLocation[clickValue] === "✸") { //클린한 것이 지뢰 일 경우, 이미지 변경 + 지뢰위치 초기화, 시간 종료
         event.target.classList.add("bomb");
         this.setState({
-          image: Fail,
           location: undefined,
           calculateLocation: undefined,
+          bombLocation: undefined,
+          image: Fail
         });
         clearInterval(timeFunc);
       }
@@ -135,6 +140,7 @@ class Container extends Component {
         this.setState(state => {
           const clickLocation = this.state.clickLocation;
           clickLocation[clickValue] = undefined;
+          this.checkGame();
           return {
             clickLocation,
             bomb: this.state.bomb + 1
@@ -144,12 +150,51 @@ class Container extends Component {
         this.setState(state => {
           const clickLocation = this.state.clickLocation;
           clickLocation[clickValue] = "♖";
+          this.checkGame();
           return {
             clickLocation, 
             bomb: this.state.bomb - 1
           };
         });
       }
+    }
+  }
+
+  checkGame() { //찾은 지뢰가 5개이고, 위치가 동일하다면 게임 종료
+    const realBomb = this.state.bombLocation.sort((a,b) => {
+      return a - b;
+    });
+
+    let clickArr = [];
+    this.state.clickLocation.filter(function(element,index){
+      if(element === "♖") {
+        clickArr.push(index);
+      }
+    });
+    clickArr.sort((a,b) => {
+      return a - b;
+    })
+    
+    let check;
+    if(clickArr.length === 5) {
+      for(let i = 0; i < clickArr.length; i++) {
+        if(clickArr[i] === realBomb[i]) {
+          check = true;
+        } else {
+          check = null;
+          break;
+        }
+      }
+    }
+
+    if(check === true) {
+      this.setState({
+        location: undefined,
+        calculateLocation: undefined,
+        bombLocation: undefined,
+        image: Success,
+      })
+      clearInterval(timeFunc);
     }
   }
 
