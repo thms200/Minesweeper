@@ -1,13 +1,18 @@
 import React, { Component } from 'react';
 import Header from "./Header";
 import Section from "./Section";
+import Start from './start.jpg';
+import Ing from './ing.jpg';
+import Fail from './fail.jpg';
 
 class Container extends Component {
   constructor(props) {
     super(props)
     this.state = {
       location: undefined,
-      calculateLocation: undefined
+      calculateLocation: undefined,
+      clickLocation: [],
+      image: Start
     }
   }
 
@@ -24,7 +29,7 @@ class Container extends Component {
 
     const locationArr = [0]; //지뢰 위치를 포함한 총 위치배열 (지뢰가 있는 곳은 *)
     arr.map(function(element){
-      locationArr[element] = "*";
+      locationArr[element] = "✸";
     });
 
     for(let i = 1; i <= 25; i++) { //지뢰가 없는 곳은 0
@@ -38,7 +43,7 @@ class Container extends Component {
     function calculateBomb (arr, value, index) {
       let result = 0;
       for(let i = 0; i < arr.length; i++) {
-        if(value[index+arr[i]] === "*") {
+        if(value[index+arr[i]] === "✸") {
           result++
         }
       }
@@ -46,8 +51,8 @@ class Container extends Component {
     }
 
     for(let i = 1; i < 26; i++) {
-      if(locationArr[i] === "*") {
-        calculateArr.push("*");
+      if(locationArr[i] === "✸") {
+        calculateArr.push("✸");
       } else {
         if(i === 1) {
           calculateArr.push(calculateBomb([1, 6, 5], locationArr, i))
@@ -73,16 +78,46 @@ class Container extends Component {
 
     this.setState({
       location: locationArr,
-      calculateLocation: calculateArr
+      calculateLocation: calculateArr,
+      image: Ing,
+      clickLocation: []
     });
-    console.log(arr);
+
+    const bombClass = document.querySelectorAll(".bomb");
+    bombClass.forEach(function(element){
+      element.classList.remove("bomb");
+    })
+  }
+
+  showNumberBomb(event) {
+    const clickValue = Number(event.target.className);
+
+    if(this.state.calculateLocation !== undefined) {
+      this.setState(state => {
+        const clickLocation = this.state.clickLocation;
+        clickLocation[clickValue] = this.state.calculateLocation[clickValue];
+        return {
+          clickLocation
+        };
+      });
+      
+      if(this.state.calculateLocation[clickValue] === "✸") {
+        // event.target.style.backgroundColor = "red";
+        event.target.classList.add("bomb");
+        this.setState({
+          image: Fail,
+          location: undefined,
+          calculateLocation: undefined,
+        });
+      }
+    }
   }
 
   render() {
     return (
       <div>
-        <Header start={this.makeMinesweeper.bind(this)}></Header>
-        <Section></Section>
+        <Header start={this.makeMinesweeper.bind(this)} container_image={this.state.image}></Header>
+        <Section show={this.showNumberBomb.bind(this)} container_clickLocation={this.state.clickLocation}></Section>
       </div>
     )
   }
