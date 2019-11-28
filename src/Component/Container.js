@@ -1,12 +1,17 @@
 import React, { Component } from 'react';
 import Header from "./Header";
 import Section from "./Section";
+import Footer from "./Footer";
 import Start from './start.jpg';
 import Ing from './ing.jpg';
 import Fail from './fail.jpg';
 import Success from './success.jpg'
 
 let timeFunc; //setInterval 함수를 담을 변수
+const today = new Date();
+const yy = today.getFullYear().toString().slice(2);
+const mm = (today.getMonth() + 1).toString();
+const dd = today.getDate().toString();
 
 class Container extends Component {
   constructor(props) {
@@ -18,7 +23,10 @@ class Container extends Component {
       bombLocation: undefined,
       image: Start,
       time: 0,
-      bomb: 5
+      bomb: 5,
+      today: yy + mm + dd,
+      count: 1,
+      record: [],
     }
   }
 
@@ -195,7 +203,29 @@ class Container extends Component {
         image: Success,
       })
       clearInterval(timeFunc);
+
+      setTimeout(() => {
+        const user = prompt("Please enter your name."); //게임이 종료하면 username작성, date와 time을 함께 저장함.
+        if(user !== null) {
+          this.setState(state => {
+            const record = this.state.record;
+            record.push([this.state.count, this.state.today, user, this.state.time]);
+            this.recordSort();
+            return {
+              record, count: this.state.count + 1
+            }
+          })
+        }
+      }, 0)
     }
+  }
+
+  recordSort() {
+    this.setState(state => {
+      this.state.record.sort((a,b) => {
+        return a[3] - b[3];
+      })
+    })
   }
 
   render() {
@@ -214,6 +244,7 @@ class Container extends Component {
           count={this.countBomb.bind(this)}
         >
         </Section>
+        <Footer container_record={this.state.record}></Footer>
       </div>
     )
   }
