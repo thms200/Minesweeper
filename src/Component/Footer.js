@@ -7,19 +7,19 @@ class Footer extends Component {
         <ul className="date">
           <li>Date</li>
           {this.props.container_record.map((element) => {
-            return (<li>{element[1]}</li>)
+            return (<li key={element[0]}>{element[1]}</li>)
           })}
         </ul>
         <ul className="name">
           <li>Name</li>
           {this.props.container_record.map((element) => {
-            return (<li>{element[2]}</li>)
+            return (<li key={element[0]}>{element[2]}</li>)
           })}
         </ul>
         <ul className="time">
           <li>Time</li>
           {this.props.container_record.map((element) => {
-            return (<li>{element[3]}</li>)
+            return (<li key={element[0]}>{element[3]}</li>)
           })}
         </ul>
       </footer>
