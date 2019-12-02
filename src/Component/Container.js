@@ -205,14 +205,9 @@ class Container extends Component {
     });
   }
 
-  //클릭할 때 ""면, 
   countBomb(event) { //오른쪽 클릭 시 지뢰를 표시(♖)
     event.preventDefault();
     const clickValue = Number(event.target.className);
-
-    console.log(clickValue)
-    console.log(event.target.innerHTML)
-    console.log('event.target.innerHTML === ""', event.target.innerHTML === "")
 
     if(this.state.calculateLocation !== undefined) {
       if(event.target.innerHTML === "") {
@@ -239,30 +234,6 @@ class Container extends Component {
         return false;
       }
     }
-
-    // if(this.state.calculateLocation !== undefined) {
-    //   if(this.state.clickLocation[clickValue] === "♖") {
-    //     this.setState(state => {
-    //       const clickLocation = this.state.clickLocation;
-    //       clickLocation[clickValue] = undefined;
-    //       this.checkGame();
-    //       return {
-    //         clickLocation,
-    //         bomb: this.state.bomb + 1
-    //       };
-    //     });
-    //   } else {
-    //     this.setState(state => {
-    //       const clickLocation = this.state.clickLocation;
-    //       clickLocation[clickValue] = "♖";
-    //       this.checkGame();
-    //       return {
-    //         clickLocation, 
-    //         bomb: this.state.bomb - 1
-    //       };
-    //     });
-    //   }
-    // }
   }
 
   checkGame() { //찾은 지뢰가 5개이고, 위치가 동일하다면 게임 종료
