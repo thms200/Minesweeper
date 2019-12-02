@@ -123,6 +123,10 @@ class Container extends Component {
   showNumberBomb(event) {
     const clickValue = Number(event.target.className);
 
+    if(event.target.innerHTML !== "") {
+      return false;
+    }
+
     if(this.state.calculateLocation !== undefined) { //클릭 시 근처 위치의 지뢰 숫자 표현
       if(this.state.calculateLocation[clickValue] === 0 || this.state.calculateLocation[clickValue] === 1) {
         this.countZero(clickValue, this.state.calculateLocation);
@@ -201,12 +205,27 @@ class Container extends Component {
     });
   }
 
+  //클릭할 때 ""면, 
   countBomb(event) { //오른쪽 클릭 시 지뢰를 표시(♖)
     event.preventDefault();
     const clickValue = Number(event.target.className);
 
+    console.log(clickValue)
+    console.log(event.target.innerHTML)
+    console.log('event.target.innerHTML === ""', event.target.innerHTML === "")
+
     if(this.state.calculateLocation !== undefined) {
-      if(this.state.clickLocation[clickValue] === "♖") {
+      if(event.target.innerHTML === "") {
+        this.setState(state => {
+          const clickLocation = this.state.clickLocation;
+          clickLocation[clickValue] = "♖";
+          this.checkGame();
+          return {
+            clickLocation, 
+            bomb: this.state.bomb - 1
+          };
+        });
+      } else if(event.target.innerHTML === "♖") {
         this.setState(state => {
           const clickLocation = this.state.clickLocation;
           clickLocation[clickValue] = undefined;
@@ -217,17 +236,33 @@ class Container extends Component {
           };
         });
       } else {
-        this.setState(state => {
-          const clickLocation = this.state.clickLocation;
-          clickLocation[clickValue] = "♖";
-          this.checkGame();
-          return {
-            clickLocation, 
-            bomb: this.state.bomb - 1
-          };
-        });
+        return false;
       }
     }
+
+    // if(this.state.calculateLocation !== undefined) {
+    //   if(this.state.clickLocation[clickValue] === "♖") {
+    //     this.setState(state => {
+    //       const clickLocation = this.state.clickLocation;
+    //       clickLocation[clickValue] = undefined;
+    //       this.checkGame();
+    //       return {
+    //         clickLocation,
+    //         bomb: this.state.bomb + 1
+    //       };
+    //     });
+    //   } else {
+    //     this.setState(state => {
+    //       const clickLocation = this.state.clickLocation;
+    //       clickLocation[clickValue] = "♖";
+    //       this.checkGame();
+    //       return {
+    //         clickLocation, 
+    //         bomb: this.state.bomb - 1
+    //       };
+    //     });
+    //   }
+    // }
   }
 
   checkGame() { //찾은 지뢰가 5개이고, 위치가 동일하다면 게임 종료
